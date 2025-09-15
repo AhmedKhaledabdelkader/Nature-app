@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ImpactResource;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Impact;
 use Exception;
@@ -80,30 +81,13 @@ class ImpactController extends Controller
     {
 
 
-        $impacts=Impact::all()->map(function($impact){
-
-       return [
-
-        "id"=>$impact->id,
-        "impactName"=>$impact->impactName,
-        "impactNumber"=>$impact->impactNumber,
-        "impactLogo"=>$impact->impactLogo
-
-
-       ];
-
-
-
-
-
-        });
-
+        $impacts=Impact::all();
 
 
         return response()->json([
 
             "message"=>"retreiving impacts successfully",
-            "impacts"=>$impacts
+            "impacts"=>ImpactResource::collection($impacts),
 
 
 
@@ -126,24 +110,11 @@ class ImpactController extends Controller
             return response()->json(["message" => "Impact with id $impactId not found"], 404);
         }
 
-
-
-        $mappedImpact=[
-
-            "id"=>$impact->id,
-            "impactName"=>$impact->impactName,
-            "impactNumber"=>$impact->impactNumber,
-            "impactLogo"=>$impact->impactLogo
-
-        ];
-
-
-
         return response()->json([
 
 
             "message"=>"retreiving impact successfully",
-            "impact"=>$mappedImpact
+            "impact"=>new ImpactResource($impact)
 
 
         ], 200);

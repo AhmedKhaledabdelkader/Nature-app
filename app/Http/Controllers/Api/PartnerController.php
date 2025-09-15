@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PartnerResource;
 use App\Models\Partner;
 use Illuminate\Http\Request;
 use Exception;
@@ -79,33 +80,14 @@ class PartnerController extends Controller
 
 
 
-$partners=Partner::all()->map(function($partner){
-
-
-    return [
-
-        "id"=>$partner->id,
-        "partnerName"=>$partner->partnerName,
-        "partnerLogo"=>$partner->partnerLogo,
-
-
-
-
-    ];
-
-
-
-
-
-
-});
+$partners=Partner::all();
 
 
 return response()->json([
 
 
     "message"=>"partners retrieved successfully",
-    "partners"=>$partners
+    "partners"=>PartnerResource::collection($partners)
 
 
 ],200);
@@ -126,22 +108,11 @@ return response()->json([
         }
 
 
-
-        $mappedPartner=[
-
-            "id"=>$partner->id,
-            "partnerName"=>$partner->partnerName,
-            "partnerLogo"=>$partner->partnerLogo
-
-        ];
-
-
-
         return response()->json([
 
 
             "message"=>"retreiving partner successfully",
-            "partner"=>$mappedPartner
+            "partner"=>new PartnerResource($partner)
 
 
         ], 200);

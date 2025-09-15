@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CompanyResource;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -88,26 +89,12 @@ public function index(Request $request){
 
 
 
-    $companies = Company::all()->map(function($company) {
-        return [
-            "id" => $company->id,
-            "companyName"=>$company->company_name,
-            "companyDescription"=>$company->company_description,
-            "companyImage"=>$company->company_image,
-            "companyLogo"=>$company->company_logo
-        ];
-    });
-    
-
-
-
+    $companies = Company::all();
     return response()->json([
 
 
         "message"=>"companies retrieved successfully",
-        "companies"=>$companies
-
-
+        "companies"=>CompanyResource::collection($companies),
 
     ],200);
 
@@ -137,21 +124,11 @@ public function show(Request $request,$companyId){
     }
 
 
-    $mappedCompany=[
-
-        "id" => $company->id,
-            "companyName"=>$company->company_name,
-            "companyDescription"=>$company->company_description,
-            "companyImage"=>$company->company_image,
-            "companyLogo"=>$company->company_logo
-
-    ];
-
 
     return response()->json([
 
         "message"=>"company retrieved successfully",
-        "company"=>$mappedCompany
+        "company"=>new CompanyResource($company)
 
 
 

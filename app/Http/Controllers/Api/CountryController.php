@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CountryResource;
 use App\Models\Country;
 use Exception;
 use Illuminate\Http\Request;
@@ -57,68 +58,40 @@ try{
 
 
 
-
-    public function index()
+   public function index()
     {
 
     
-        $countries = Country::with("projects")->get()->map(function($country) {
-            return [
-                "id" => $country->id,
-                "countryName" => $country->countryName,
-                "projects" => $country->projects->map(function($project) {
-                    return [
-                        "id" => $project->id,
-                        "projectName" => $project->projectName,
-                        "projectDescription" => $project->projectDescription,
-                        "projectImage" => $project->projectImage,
-                        "countryId" => $project->country_id,
-                    ];
-                })
-            ];
-        });
+        $countries = Country::with("projects")->get();
 
 
 
         return response()->json([
             "message" => "retrieving countries successfully",
-            "countries"=>$countries
+            "countries"=>CountryResource::collection($countries)
           
         ], 200);
     }
-    
 
 
 
-    
+
     public function show($countryId)
     {
-        $country = Country::find($countryId);
-
+        $country = Country::with("projects")->find($countryId);
+    
         if (!$country) {
             return response()->json(["message" => "country with id $countryId not found"], 404);
         }
-
-        $mappedCountry=[
-
- 
-            "id"=>$country->id,
-            "countryName"=>$country->countryName
-
-
-
-
-        ];
-
+    
+      
+    
         return response()->json([
-
-
-            "message"=>"retreiving country successfully",
-            "country"=>$mappedCountry
-
-
+            "message" => "retrieving country successfully",
+            "country" => new CountryResource($country)
         ], 200);
     }
+    
 
 
 
@@ -154,7 +127,7 @@ try{
     return response()->json([
 
         "status"=>"error",
-        "message"=>"an error occurred while creating the country",
+        "message"=>"an error occurred while updating the country",
         "error"=>$e->getMessage()
 
     ],500);

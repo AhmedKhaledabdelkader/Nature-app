@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Exception ;
@@ -70,31 +71,13 @@ try{
     {
 
 
-        $projects=Project::all()->map(function($project){
-
-        return [
-
-
-            "id"=>$project->id,
-            "projectName"=>$project->projectName,
-            "projectDescription"=>$project->projectDescription,
-            "projectImage"=>$project->projectImage,
-            "countryId"=>$project->country_id
-
-
-
-        ];
-
-
-
-
-        });
+        $projects=Project::all();
 
         
         return response()->json([
 
             "message"=>"retreiving projects successfully",
-            "countries"=>$projects
+            "projects"=>ProjectResource::collection($projects)
 
 
 
@@ -116,18 +99,11 @@ try{
             }
         
     
-            $mappedProject=[
-                "id" => $project->id,
-                "projectName" => $project->projectName,
-                "projectDescription" => $project->projectDescription,
-                "projectImage" => $project->projectImage,
-                "countryId" => $project->country_id
-            ];
 
 
             return response()->json([
                 "message" => "Project retrieved successfully",
-                "project" => $mappedProject
+                "project" => new ProjectResource($project)
             ], 200);
             
         } catch (Exception $e) {

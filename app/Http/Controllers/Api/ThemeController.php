@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ThemeResource;
 use App\Models\Theme;
 use Illuminate\Http\Request;
 
@@ -48,18 +49,11 @@ class ThemeController extends Controller
 
     public function index()
     {
-        $themes = Theme::all()->map(function ($theme) {
-            return [
-                "id" => $theme->id,
-                "themeName" => $theme->themeName,
-                "themeDescription" => $theme->themeDescription,
-                "themeImage" => $theme->themeImage
-            ];
-        });
+        $themes = Theme::all();
 
         return response()->json([
             "message" => "retreiving themes successfully",
-            "themes" => $themes
+            "themes" => ThemeResource::collection($themes)
         ], 200);
     }
 
@@ -71,16 +65,10 @@ class ThemeController extends Controller
             return response()->json(["message" => "Theme with id $themeId not found"], 404);
         }
 
-        $mappedTheme = [
-            "id" => $theme->id,
-            "themeName" => $theme->themeName,
-            "themeDescription" => $theme->themeDescription,
-            "themeImage" => $theme->themeImage
-        ];
 
         return response()->json([
             "message" => "retreiving theme successfully",
-            "theme" => $mappedTheme
+            "theme" => new ThemeResource($theme),
         ], 200);
     }
 
