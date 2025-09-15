@@ -8,6 +8,7 @@ use App\Models\Partner;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class PartnerController extends Controller
 {
@@ -53,7 +54,7 @@ class PartnerController extends Controller
 
 
 
-    }catch(Exception $e){
+    }catch(Throwable $e){
 
 
         return response()->json([
@@ -79,28 +80,41 @@ class PartnerController extends Controller
     public function index(Request $request){
 
 
+try
+{
 
-$partners=Partner::all();
-
-
-return response()->json([
-
-
-    "message"=>"partners retrieved successfully",
-    "partners"=>PartnerResource::collection($partners)
+        $partners=Partner::all();
 
 
-],200);
+        return response()->json([
 
+
+            "message"=>"partners retrieved successfully",
+            "partners"=>PartnerResource::collection($partners)
+
+
+        ],200);
+    
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while retrieving the partners",
+            "error"=>$e->getMessage()
+
+        ],500);
 
 
 
     }
-
+    }
 
 
     public function show($partnerId)
     {
+
+    try{
         $partner = Partner::find($partnerId);
 
         if (!$partner) {
@@ -116,8 +130,22 @@ return response()->json([
 
 
         ], 200);
+
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while retrieving the partner",
+            "error"=>$e->getMessage()
+
+        ],500);
+
+
+    
     }
 
+    }
 
 
 
@@ -174,6 +202,8 @@ return response()->json([
 
     public function destroy($partnerId)
     {
+try{
+
         $partner = Partner::find($partnerId);
 
         if (!$partner) {
@@ -188,11 +218,23 @@ return response()->json([
         $partner->delete();
 
         return response()->json(["message" => "partner deleted successfully"], 200);
+
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while deleting the partner",
+            "error"=>$e->getMessage()
+
+        ],500);
+
+
     }
 
 
 
-
+    }
 
 
 

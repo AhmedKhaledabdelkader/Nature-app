@@ -8,6 +8,7 @@ use App\Models\Country;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class CountryController extends Controller
 {
@@ -35,7 +36,7 @@ try{
 
         ],201);
 
-}catch(Exception $e){
+}catch(Throwable $e){
 
 
     return response()->json([
@@ -61,6 +62,7 @@ try{
    public function index()
     {
 
+    try{
     
         $countries = Country::with("projects")->get();
 
@@ -71,6 +73,23 @@ try{
             "countries"=>CountryResource::collection($countries)
           
         ], 200);
+
+
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while retrieving the countries",
+            "error"=>$e->getMessage()
+
+        ],500);
+
+    }
+
+
+
+
     }
 
 
@@ -78,6 +97,9 @@ try{
 
     public function show($countryId)
     {
+
+        try{
+
         $country = Country::with("projects")->find($countryId);
     
         if (!$country) {
@@ -90,6 +112,18 @@ try{
             "message" => "retrieving country successfully",
             "country" => new CountryResource($country)
         ], 200);
+
+        }catch(Throwable $e){
+
+            return response()->json([
+    
+                "status"=>"error",
+                "message"=>"an error occurred while retrieving  the country",
+                "error"=>$e->getMessage()
+    
+            ],500);
+    
+        }
     }
     
 
@@ -121,7 +155,7 @@ try{
 
 
         ],200);
-}catch(Exception $e){
+}catch(Throwable $e){
 
 
     return response()->json([
@@ -146,6 +180,8 @@ try{
 public function destroy(Request $request,$countryId){
 
 
+    try{
+
     $country = Country::find($countryId);
 
         if (!$country) {
@@ -164,7 +200,17 @@ public function destroy(Request $request,$countryId){
 
     ],200);
 
+    }catch(Throwable $e){
 
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while deleting the country",
+            "error"=>$e->getMessage()
+
+        ],500);
+
+    }
 
 
 

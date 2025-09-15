@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Impact;
 use Exception;
 use Illuminate\Http\Request;
-
+use Throwable;
 
 class ImpactController extends Controller
 {
@@ -49,7 +49,7 @@ class ImpactController extends Controller
 
         ],201);
 
-    }catch(Exception $e){
+    }catch(Throwable $e){
 
 
         return response()->json([
@@ -81,6 +81,8 @@ class ImpactController extends Controller
     {
 
 
+        try{
+
         $impacts=Impact::all();
 
 
@@ -92,6 +94,19 @@ class ImpactController extends Controller
 
 
         ], 200);
+
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while retrieving the impacts",
+            "error"=>$e->getMessage()
+
+        ],500);
+
+    }
+    
     }
 
 
@@ -104,6 +119,9 @@ class ImpactController extends Controller
 
     public function show($impactId)
     {
+
+        try{
+
         $impact = Impact::find($impactId);
 
         if (!$impact) {
@@ -118,6 +136,18 @@ class ImpactController extends Controller
 
 
         ], 200);
+
+        }catch(Throwable $e){
+
+            return response()->json([
+    
+                "status"=>"error",
+                "message"=>"an error occurred while retrieving the impact",
+                "error"=>$e->getMessage()
+    
+            ],500);
+    
+        }
     }
 
 
@@ -126,6 +156,9 @@ class ImpactController extends Controller
 
     public function update(Request $request, $impactId)
     {
+
+        try{
+
         $impact = Impact::find($impactId);
 
         if (!$impact) {
@@ -152,6 +185,19 @@ class ImpactController extends Controller
             "message" => "Impact updated successfully",
             "impact" => $impact
         ], 200);
+
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while updating the impact",
+            "error"=>$e->getMessage()
+
+        ],500);
+
+    }
+    
     }
 
 
@@ -161,6 +207,9 @@ class ImpactController extends Controller
 
     public function destroy($impactId)
     {
+
+        try{
+
         $impact = Impact::find($impactId);
 
         if (!$impact) {
@@ -173,10 +222,21 @@ class ImpactController extends Controller
         $impact->delete();
 
         return response()->json(["message" => "Impact deleted successfully"], 200);
+        
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while deleting the impact",
+            "error"=>$e->getMessage()
+
+        ],500);
+
+
     }
 
-
-
+    }
 
 
 

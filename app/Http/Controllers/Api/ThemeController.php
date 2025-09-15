@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 
 use Exception ;
+use Throwable;
 
 class ThemeController extends Controller
 {
@@ -38,7 +39,7 @@ class ThemeController extends Controller
                 "message" => "theme created successfully",
                 "theme" => $theme
             ], 201);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return response()->json([
                 "status" => "error",
                 "message" => "an error occurred while creating the theme",
@@ -49,16 +50,36 @@ class ThemeController extends Controller
 
     public function index()
     {
+
+    try{
+
         $themes = Theme::all();
 
         return response()->json([
             "message" => "retreiving themes successfully",
             "themes" => ThemeResource::collection($themes)
+    
         ], 200);
+
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while retrieving themes",
+            "error"=>$e->getMessage()
+
+        ],500);
+    
+    }
+
     }
 
     public function show($themeId)
     {
+
+        try{
+
         $theme = Theme::find($themeId);
 
         if (!$theme) {
@@ -70,10 +91,25 @@ class ThemeController extends Controller
             "message" => "retreiving theme successfully",
             "theme" => new ThemeResource($theme),
         ], 200);
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while retrieving theme",
+            "error"=>$e->getMessage()
+
+        ],500);
+    }
+
+
     }
 
     public function update(Request $request, $themeId)
     {
+
+    try{
+
         $theme = Theme::find($themeId);
 
         if (!$theme) {
@@ -97,10 +133,26 @@ class ThemeController extends Controller
             "message" => "Theme updated successfully",
             "theme" => $theme
         ], 200);
+    
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while updating theme",
+            "error"=>$e->getMessage()
+
+        ],500);
+    }
+
+
     }
 
     public function destroy($themeId)
     {
+
+        try{
+
         $theme = Theme::find($themeId);
 
         if (!$theme) {
@@ -114,7 +166,18 @@ class ThemeController extends Controller
         $theme->delete();
 
         return response()->json(["message" => "Theme deleted successfully"], 200);
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while deleting theme",
+            "error"=>$e->getMessage()
+
+        ],500);
+
     }
+}
 }
     
 

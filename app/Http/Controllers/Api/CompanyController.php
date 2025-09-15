@@ -8,7 +8,7 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Exception;
-
+use Throwable;
 
 class CompanyController extends Controller
 {
@@ -60,7 +60,7 @@ try{
 
         ],201);
 
-    }catch(Exception $e){
+    }catch(Throwable $e){
 
         return response()->json([
 
@@ -87,7 +87,7 @@ try{
 public function index(Request $request){
 
 
-
+try{
 
     $companies = Company::all();
     return response()->json([
@@ -97,6 +97,18 @@ public function index(Request $request){
         "companies"=>CompanyResource::collection($companies),
 
     ],200);
+
+}catch(Throwable $e){
+
+    return response()->json([
+
+        "status"=>"error",
+        "message"=>"an error occurred while retrieving the companies",
+        "error"=>$e->getMessage()
+
+    ],500);
+
+}
 
 }
 
@@ -108,6 +120,7 @@ public function index(Request $request){
 
 public function show(Request $request,$companyId){
 
+    try{
 
     $company=Company::where("id",$companyId)->first();
 
@@ -134,6 +147,17 @@ public function show(Request $request,$companyId){
 
     ],200);
 
+}catch(Throwable $e){
+
+    return response()->json([
+
+        "status"=>"error",
+        "message"=>"an error occurred while retrieving the company",
+        "error"=>$e->getMessage()
+
+    ],500);
+
+}
 
 
 }
@@ -199,12 +223,12 @@ public function update(Request $request,$companyId){
             "company" => $company
         ], 200);
 
-    }catch (Exception $e) {
+    }catch (Throwable $e) {
         
         return response()->json([
 
             "status"=>"error",
-            "message"=>"an error occurred while creating the company",
+            "message"=>"an error occurred updating the company",
             "error"=>$e->getMessage()
 
         ],500);
@@ -217,6 +241,8 @@ public function update(Request $request,$companyId){
 
 
 public function destroy(Request $request,$companyId){
+
+    try{
 
     $company=Company::where("id",$companyId)->first();
 
@@ -257,7 +283,17 @@ public function destroy(Request $request,$companyId){
 
     ],200);
 
+    }catch(Throwable $e){
 
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while deleting the company",
+            "error"=>$e->getMessage()
+
+        ],500);
+
+    }
 
 
 

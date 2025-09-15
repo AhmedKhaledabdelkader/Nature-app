@@ -8,6 +8,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Exception ;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class ProjectController extends Controller
 {
@@ -48,7 +49,7 @@ try{
 
         ],201);
 
-    }catch(Exception $e){
+    }catch(Throwable $e){
 
 
         return response()->json([
@@ -70,6 +71,7 @@ try{
     public function index()
     {
 
+        try{
 
         $projects=Project::all();
 
@@ -82,7 +84,20 @@ try{
 
 
         ], 200);
+
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while retrieving the projects",
+            "error"=>$e->getMessage()
+
+        ],500);
+
     }
+
+}
 
 
 
@@ -106,7 +121,7 @@ try{
                 "project" => new ProjectResource($project)
             ], 200);
             
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return response()->json([
                 "status" => "error",
                 "message" => "An error occurred while retrieving the project",
@@ -168,7 +183,7 @@ try{
                 "project" => $project
             ], 200);
     
-        }catch (Exception $e) {
+        }catch (Throwable $e) {
             
             return response()->json([
     
@@ -189,7 +204,9 @@ try{
 
     public function destroy(Request $request,$projectId){
 
+try
 
+{
         $project = Project::find($projectId);
 
         if (!$project) {
@@ -202,6 +219,19 @@ try{
         $project->delete();
 
         return response()->json(["message" => "project deleted successfully"], 200);
+
+    }catch(Throwable $e){
+
+        return response()->json([
+
+            "status"=>"error",
+            "message"=>"an error occurred while deleting the project",
+            "error"=>$e->getMessage()
+
+        ],500);
+
+
+    
     }
 
 
@@ -214,7 +244,7 @@ try{
     }
 
     
-
+}
 
 
 
