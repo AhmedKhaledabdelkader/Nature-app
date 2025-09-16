@@ -22,7 +22,7 @@ class ValidateCountry
 
             "countryName"=>["required","array"],
             "countryName.en"=>["required","string","min:2","max:50"],
-            "countryName.ar"=>["nullable","string","min:2","max:50"],
+            "countryName.ar"=>["nullable","sometimes","string","min:2","max:50"],
         ]);
 
         if($validator->fails()){

@@ -23,7 +23,7 @@ class ValidatePartner
 
             'partnerName'=>['required','array'],
             'partnerName.en'=>["sometimes","string","max:255"],
-            'partnerName.ar'=>["sometimes","string","max:255"],
+            'partnerName.ar'=>["nullable","sometimes","string","max:255"],
             'partnerLogo'=>['sometimes','image','mimes:jpeg,png,jpg,gif,svg','max:2048']
 
 

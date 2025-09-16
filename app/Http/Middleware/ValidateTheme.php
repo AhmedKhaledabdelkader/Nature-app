@@ -24,10 +24,10 @@ class ValidateTheme
         $rules = [
             'themeName' => ['required','array'],
             'themeName.en'=>['required','string',"min:2", 'max:255'],
-            "themeName.ar"=>['sometimes','string',"min:2", 'max:255'],
+            "themeName.ar"=>["nullable",'sometimes','string',"min:2", 'max:255'],
             'themeDescription' => ['required', 'array'],
             'themeDescription.en' => ['required', 'string','max:5000'],
-            'themeDescription.ar' => ['sometimes', 'string','max:5000'],
+            'themeDescription.ar' => ["nullable",'sometimes', 'string','max:5000'],
             'themeImage' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
            
         ];

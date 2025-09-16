@@ -23,7 +23,7 @@ class ValidateImpact
 
             'impactName'=>['required','array'],
             'impactName.en'=>["required","string","max:255"],
-            'impactName.ar'=>["string","max:255"],
+            'impactName.ar'=>["nullable","sometimes","string","max:255"],
             'impactNumber'=>['required','Integer'],
             'impactLogo'=>['required','image','mimes:jpeg,png,jpg,gif,svg','max:2048']
 
