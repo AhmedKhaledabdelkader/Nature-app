@@ -29,11 +29,11 @@ class ValidateCompany
             'company_description.ar'=>["nullable","sometimes","string","max:5000"],
             'company_image' => [
                 'required',
-                'mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime',
+                'mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,image/svg+xml',
                 'max:51200' // max 50MB (value is in KB)
             ],
             
-            'company_logo'=>['nullable','image','mimes:jpeg,png,jpg,gif,svg','max:2048']
+            'company_logo'=>['nullable','image','mimes:jpeg,png,webp,jpg,gif,svg','max:2048']
 
 
         ];

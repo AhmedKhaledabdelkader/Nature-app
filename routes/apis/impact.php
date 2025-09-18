@@ -29,3 +29,8 @@ Route::get("/{impactId}",[ImpactController::class,'show']);
 });
 
 Route::delete("/{impactId}",[ImpactController::class,'destroy']);
+
+
+
+Route::get('/media/{filename}', [ImpactController::class, 'showMedia'])->where('filename', '.*');
+    

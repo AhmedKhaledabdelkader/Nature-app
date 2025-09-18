@@ -9,6 +9,7 @@ use App\Models\Impact;
 use Exception;
 use Illuminate\Http\Request;
 use Throwable;
+use Illuminate\Support\Facades\Log; 
 
 class ImpactController extends Controller
 {
@@ -22,7 +23,7 @@ class ImpactController extends Controller
     if ($request->hasFile("impactLogo")) {
             
             $logo = $request->file('impactLogo');
-            $logoPath= $logo->store('impacts', 'public'); 
+            $logoPath= $logo->store('impacts', 'private'); 
         }
 
 
@@ -166,7 +167,7 @@ class ImpactController extends Controller
         }
 
         if ($impact->impactLogo) {
-            Storage::disk('public')->delete($impact->impactLogo); 
+            Storage::disk('private')->delete($impact->impactLogo); 
         }
         
 
@@ -174,7 +175,7 @@ class ImpactController extends Controller
 
 
             $logo = $request->file('impactLogo');
-            $impact->impactLogo = $logo->store('impacts', 'public');
+            $impact->impactLogo = $logo->store('impacts', 'private');
         }
 
         $impact->impactName = $request->impactName;
@@ -217,7 +218,7 @@ class ImpactController extends Controller
         }
 
 
-        Storage::disk('public')->delete($impact->impactLogo);
+        Storage::disk('private')->delete($impact->impactLogo);
 
         $impact->delete();
 
@@ -238,6 +239,13 @@ class ImpactController extends Controller
 
     }
 
+  
 
+
+ 
 
 }
+
+
+
+

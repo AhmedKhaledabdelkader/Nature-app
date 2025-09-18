@@ -24,7 +24,7 @@ class PartnerController extends Controller
             $logo=$request->file('partnerLogo');
 
 
-            $logoPath= $logo->store('partners', 'public');
+            $logoPath= $logo->store('partners', 'private');
 
 
         }
@@ -161,7 +161,7 @@ try
         }
 
         if ($partner->partnerLogo) {
-            Storage::disk('public')->delete($partner->partnerLogo); 
+            Storage::disk('private')->delete($partner->partnerLogo); 
         }
         
 
@@ -169,7 +169,7 @@ try
 
 
             $logo = $request->file('partnerLogo');
-            $logoPath = $logo->store('partners', 'public');
+            $logoPath = $logo->store('partners', 'private');
         }
 
         $partner->partnerLogo=$logoPath??null ;
@@ -212,7 +212,7 @@ try{
 
 
         if ($partner->partnerLogo) {
-        Storage::disk('public')->delete($partner->partnerLogo);
+        Storage::disk('private')->delete($partner->partnerLogo);
         }
 
         $partner->delete();

@@ -19,3 +19,5 @@ Route::prefix('projects')->group(base_path('routes/apis/project.php'));
 Route::prefix('partners')->group(base_path('routes/apis/partner.php'));
 
 Route::prefix('themes')->group(base_path('routes/apis/theme.php'));
+
+Route::prefix('media')->group(base_path('routes/apis/media.php'));

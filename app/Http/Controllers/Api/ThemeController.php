@@ -26,7 +26,7 @@ class ThemeController extends Controller
             
             if ($request->hasFile("themeImage")) {
                 $image = $request->file('themeImage');
-                $imagePath = $image->store('themes', 'public');
+                $imagePath = $image->store('themes', 'private');
             }
 
             $theme = Theme::create([
@@ -117,12 +117,12 @@ class ThemeController extends Controller
         }
 
         if ($theme->themeImage) {
-            Storage::disk('public')->delete($theme->themeImage);
+            Storage::disk('private')->delete($theme->themeImage);
         }
 
         if ($request->hasFile("themeImage")) {
             $image = $request->file('themeImage');
-            $theme->themeImage = $image->store('themes', 'public');
+            $theme->themeImage = $image->store('themes', 'private');
         }
 
         $theme->themeName = $request->themeName;
@@ -160,7 +160,7 @@ class ThemeController extends Controller
         }
 
         if ($theme->themeImage) {
-            Storage::disk('public')->delete($theme->themeImage);
+            Storage::disk('private')->delete($theme->themeImage);
         }
 
         $theme->delete();

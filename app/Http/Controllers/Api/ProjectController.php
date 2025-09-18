@@ -23,7 +23,7 @@ try{
         if ($request->hasFile("projectImage")) {
         
             $image= $request->file('projectImage');
-            $imagePath= $image->store('projects', 'public');             
+            $imagePath= $image->store('projects', 'private');             
 
         }
 
@@ -159,12 +159,12 @@ try{
         
     
             if ($project->projectImage) {
-                Storage::disk('public')->delete($project->projectImage); 
+                Storage::disk('private')->delete($project->projectImage); 
             }
     
     
             $image = $request->file('projectImage');
-            $imagePath= $image->store('projects', 'public'); 
+            $imagePath= $image->store('projects', 'private'); 
            
             $project->projectImage=$imagePath;
         
@@ -214,7 +214,7 @@ try
         }
 
 
-        Storage::disk('public')->delete($project->projectImage);
+        Storage::disk('private')->delete($project->projectImage);
 
         $project->delete();
 

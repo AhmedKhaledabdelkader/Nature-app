@@ -25,14 +25,14 @@ try{
         if ($request->hasFile('company_image')) {
           
             $video = $request->file('company_image');
-            $videoPath= $video->store('companies/videos', 'public'); 
+            $videoPath= $video->store('companies/videos', 'private'); 
         }
 
 
         if ($request->hasFile('company_logo')) {
           
             $logo = $request->file('company_logo');
-            $logoPath= $logo->store('companies/logos', 'public'); 
+            $logoPath= $logo->store('companies/logos', 'private'); 
         }
 
 
@@ -187,12 +187,12 @@ public function update(Request $request,$companyId){
     
 
         if ($company->company_image) {
-            Storage::disk('public')->delete($company->company_image); 
+            Storage::disk('private')->delete($company->company_image); 
         }
 
 
         $video = $request->file('company_image');
-        $videoPath= $video->store('companies/videos', 'public'); 
+        $videoPath= $video->store('companies/videos', 'private'); 
        
         $company->company_image= $videoPath;
     
@@ -203,12 +203,12 @@ public function update(Request $request,$companyId){
 
             
         if ($company->company_logo) {
-            Storage::disk('public')->delete($company->company_logo); 
+            Storage::disk('private')->delete($company->company_logo); 
         }
 
 
             $logo = $request->file('company_logo');
-            $logoPath = $logo->store('companies/logos', 'public');
+            $logoPath = $logo->store('companies/logos', 'private');
             $company->company_logo = $logoPath;
         }
 
@@ -263,14 +263,14 @@ public function destroy(Request $request,$companyId){
        if ($company->company_image) {
         
    
-        Storage::disk('public')->delete($company->company_image);
+        Storage::disk('private')->delete($company->company_image);
 
        }
 
 
         if ($company->company_logo) {
             
-            Storage::disk('public')->delete($company->company_logo);
+            Storage::disk('private')->delete($company->company_logo);
         }
     
 
