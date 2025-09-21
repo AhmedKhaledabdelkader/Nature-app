@@ -1,4 +1,4 @@
-name: Build and Deploy Laravel App (Production - EVA)
+name: Build and Deploy Laravel (Production - EVA)
 
 on:
   push:
@@ -6,11 +6,11 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Your Windows runner
+    runs-on: self-hosted  # Windows runner
 
     defaults:
       run:
-        shell: pwsh
+        shell: '"C:\Program Files\PowerShell\7\pwsh.exe" -command {0}'
 
     steps:
       - name: Checkout Code
@@ -19,25 +19,17 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: '8.2'
           tools: composer
           ini-file: production
 
-      - name: Install Dependencies
+      - name: Install Composer Dependencies
         run: composer install --no-dev --optimize-autoloader
 
-      - name: Copy Environment File
-        run: Copy-Item .env.production .env -Force
-
-      - name: Run Laravel Optimizations
-        run: |
-          php artisan config:clear
-          php artisan cache:clear
-          php artisan route:cache
-          php artisan config:cache
-          php artisan view:cache
+      - name: Run Laravel Migrations
+        run: php artisan migrate --force
 
       - name: Deploy to IIS Folder
         run: |
-          Remove-Item -Recurse -Force "C:\EVAWebsite\*" -ErrorAction SilentlyContinue
-          Copy-Item -Recurse -Force . "C:\EVAWebsite"
+          Remove-Item -Recurse -Force "C:\inetpub\wwwroot\EVA" -ErrorAction SilentlyContinue
+          Copy-Item -Recurse -Force . "C:\inetpub\wwwroot\EVA"
