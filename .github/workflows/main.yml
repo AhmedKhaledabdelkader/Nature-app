@@ -20,10 +20,12 @@ jobs:
           php-version: 8.2
           tools: composer
           ini-file: production
+          extensions: fileinfo, mbstring, intl, pdo_mysql
 
       - name: Check PHP & Composer versions
         run: |
           php -v
+          php -m
           composer -V
 
       - name: Fix Composer global config (bad bin-dir)
