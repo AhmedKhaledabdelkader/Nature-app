@@ -24,9 +24,12 @@ jobs:
           php-version: '8.2'
           tools: composer
           ini-file: production
-
+          
       - name: Install Composer Dependencies
-        run: composer install --no-dev --optimize-autoloader
+        run: |
+            composer config bin-dir vendor/bin
+            composer install --no-dev --optimize-autoloader --no-scripts
+
 
       - name: Run Laravel Migrations
         run: php artisan migrate --force
