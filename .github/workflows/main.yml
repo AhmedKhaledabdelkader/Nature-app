@@ -1,0 +1,67 @@
+name: Deploy Laravel to Windows Server
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Setup PHP with required extensions
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo_mysql, fileinfo, pdo_sqlite, sqlite3
+          tools: composer
+
+      # 3. Install PHP dependencies
+      - name: Install Composer Dependencies
+        run: composer install --no-dev --optimize-autoloader --no-scripts
+
+      # 4. Prepare target folder
+      - name: Prepare Deploy Folder
+        shell: pwsh
+        run: |
+          $target = "C:\natureBackend"
+
+          if (Test-Path $target) {
+            Write-Output "Cleaning $target..."
+            Remove-Item -Recurse -Force $target
+          }
+          New-Item -ItemType Directory -Path $target | Out-Null
+
+      # 5. Copy project files
+      - name: Deploy Project Files
+        shell: pwsh
+        run: |
+          $source = "${{ github.workspace }}"
+          $target = "C:\natureBackend"
+          Write-Output "Source: $source"
+          Write-Output "Target: $target"
+          Copy-Item -Path $source\* -Destination $target -Recurse -Force
+
+      # 6. Laravel setup
+      - name: Laravel Setup
+        shell: pwsh
+        run: |
+          cd C:\natureBackend
+
+          # Copy .env if not already present
+          if (-Not (Test-Path ".env")) {
+            Copy-Item ".env.example" ".env"
+          }
+
+          # Generate app key
+          php artisan key:generate --force
+
+          # Run migrations (for sqlite/mysql)
+          php artisan migrate --force
