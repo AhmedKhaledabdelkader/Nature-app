@@ -28,14 +28,25 @@ jobs:
           php -m
           composer -V
 
-      - name: Fix Composer global config (bad bin-dir)
+      - name: Fix Composer global config
         run: composer global config --unset bin-dir
 
       - name: Install dependencies
         run: composer install --no-dev --optimize-autoloader --no-scripts
 
+      - name: Publish project to C:\natureBackend
+        run: |
+          $target = "C:\natureBackend"
+          if (Test-Path $target) {
+            Remove-Item -Recurse -Force $target
+          }
+          New-Item -ItemType Directory -Path $target | Out-Null
+          Copy-Item -Path .\* -Destination $target -Recurse -Force
+          Write-Output "Project published to $target"
+
       - name: Laravel cache optimizations
         run: |
+          cd C:\natureBackend
           php artisan config:clear
           php artisan config:cache
           php artisan route:cache
