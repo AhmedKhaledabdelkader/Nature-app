@@ -1,61 +1,40 @@
-name: Build and Deploy EVA (Laravel + Angular)
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  build-and-deploy:
-    runs-on: self-hosted  # Windows runner
-
-    defaults:
-      run:
-        shell: '"C:\Program Files\PowerShell\7\pwsh.exe" -command {0}'
+  build:
+    runs-on: windows-latest
 
     steps:
-      # --- Checkout repository ---
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # --- PHP / Laravel setup ---
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: 8.2
           tools: composer
           ini-file: production
-          
-      - name: Install Composer Dependencies
+
+      - name: Check PHP & Composer versions
         run: |
-            composer config bin-dir vendor/bin
-            composer install --no-dev --optimize-autoloader --no-scripts
+          php -v
+          composer -V
 
+      - name: Fix Composer global config (bad bin-dir)
+        run: composer global config --unset bin-dir
 
-      - name: Run Laravel Migrations
-        run: php artisan migrate --force
+      - name: Install dependencies
+        run: composer install --no-dev --optimize-autoloader --no-scripts
 
-      - name: Deploy Laravel to IIS
+      - name: Laravel cache optimizations
         run: |
-          Remove-Item -Recurse -Force "C:\inetpub\wwwroot\EVA_Backend" -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\EVA_Backend" -Force | Out-Null
-          Copy-Item -Recurse -Force . "C:\inetpub\wwwroot\EVA_Backend"
-
-      # --- Angular setup ---
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install Angular Dependencies
-        run: npm install
-        working-directory: ./frontend   # adjust if Angular is in a subfolder
-
-      - name: Build Angular App (Production)
-        run: npx ng build --configuration=production --base-href / --output-path "C:\EVAWebsite"
-        working-directory: ./frontend   # adjust if needed
-
-      - name: Deploy Angular to IIS
-        run: |
-          Remove-Item -Recurse -Force "C:\inetpub\wwwroot\EVA_Frontend" -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\EVA_Frontend" -Force | Out-Null
-          Copy-Item -Recurse -Force "C:\EVAWebsite\*" "C:\inetpub\wwwroot\EVA_Frontend"
+          php artisan config:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
