@@ -1,4 +1,4 @@
-name: Build and Deploy Laravel (Production - EVA)
+name: Build and Deploy EVA (Laravel + Angular)
 
 on:
   push:
@@ -6,16 +6,18 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Windows runner
+    runs-on: self-hosted  # Your Windows runner
 
     defaults:
       run:
         shell: '"C:\Program Files\PowerShell\7\pwsh.exe" -command {0}'
 
     steps:
+      # --- Checkout repository ---
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # --- PHP / Laravel setup ---
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -24,12 +26,33 @@ jobs:
           ini-file: production
 
       - name: Install Composer Dependencies
-        run: composer install --no-dev --optimize-autoloader
+        run: composer install --no-dev --optimize-autoloader --bin-dir=C:\tmp\bin
 
       - name: Run Laravel Migrations
         run: php artisan migrate --force
 
-      - name: Deploy to IIS Folder
+      - name: Deploy Laravel to IIS
         run: |
-          Remove-Item -Recurse -Force "C:\inetpub\wwwroot\EVA" -ErrorAction SilentlyContinue
-          Copy-Item -Recurse -Force . "C:\inetpub\wwwroot\EVA"
+          Remove-Item -Recurse -Force "C:\inetpub\wwwroot\EVA_Backend" -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\EVA_Backend" -Force | Out-Null
+          Copy-Item -Recurse -Force . "C:\inetpub\wwwroot\EVA_Backend"
+
+      # --- Angular setup ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Angular Dependencies
+        run: npm install
+        working-directory: ./frontend   # adjust if your Angular app is in a subfolder
+
+      - name: Build Angular App (Production)
+        run: npx ng build --configuration=production --base-href / --output-path "C:\EVAWebsite"
+        working-directory: ./frontend   # adjust if needed
+
+      - name: Deploy Angular to IIS
+        run: |
+          Remove-Item -Recurse -Force "C:\inetpub\wwwroot\EVA_Frontend" -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\EVA_Frontend" -Force | Out-Null
+          Copy-Item -Recurse -Force "C:\EVAWebsite\*" "C:\inetpub\wwwroot\EVA_Frontend"
