@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Your Windows runner
+    runs-on: self-hosted  # Windows runner
 
     defaults:
       run:
@@ -26,7 +26,7 @@ jobs:
           ini-file: production
 
       - name: Install Composer Dependencies
-        run: composer install --no-dev --optimize-autoloader --bin-dir=C:\tmp\bin
+        run: composer install --no-dev --optimize-autoloader
 
       - name: Run Laravel Migrations
         run: php artisan migrate --force
@@ -45,7 +45,7 @@ jobs:
 
       - name: Install Angular Dependencies
         run: npm install
-        working-directory: ./frontend   # adjust if your Angular app is in a subfolder
+        working-directory: ./frontend   # adjust if Angular is in a subfolder
 
       - name: Build Angular App (Production)
         run: npx ng build --configuration=production --base-href / --output-path "C:\EVAWebsite"
