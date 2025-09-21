@@ -15,19 +15,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Setup PHP
+      # 2. Setup PHP with required extensions
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, intl, pdo_mysql, fileinfo
+          extensions: mbstring, intl, pdo_mysql, fileinfo, pdo_sqlite, sqlite3
           tools: composer
 
       # 3. Install PHP dependencies
       - name: Install Composer Dependencies
         run: composer install --no-dev --optimize-autoloader --no-scripts
 
-      # 4. Prepare target folder (no broken icacls)
+      # 4. Prepare target folder
       - name: Prepare Deploy Folder
         shell: pwsh
         run: |
@@ -63,5 +63,5 @@ jobs:
           # Generate app key
           php artisan key:generate --force
 
-          # Run migrations
+          # Run migrations (for sqlite/mysql)
           php artisan migrate --force
