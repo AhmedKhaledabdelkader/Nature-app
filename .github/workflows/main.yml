@@ -27,7 +27,7 @@ jobs:
       - name: Install Composer Dependencies
         run: composer install --no-dev --optimize-autoloader --no-scripts
 
-      # 4. Prepare target folder
+      # 4. Prepare target folder (no broken icacls)
       - name: Prepare Deploy Folder
         shell: pwsh
         run: |
@@ -38,10 +38,6 @@ jobs:
             Remove-Item -Recurse -Force $target
           }
           New-Item -ItemType Directory -Path $target | Out-Null
-
-          # Fix permissions
-          icacls $target /grant "Network Service:F" /T
-          icacls $target /grant "$env:USERNAME:F" /T
 
       # 5. Copy project files
       - name: Deploy Project Files
