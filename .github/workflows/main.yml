@@ -9,7 +9,7 @@ jobs:
     runs-on: self-hosted  # Windows runner
     defaults:
       run:
-        shell: powershell  # Force Windows PowerShell for all steps
+        shell: powershell.exe  # Force Windows PowerShell EXE
 
     steps:
       - name: Checkout Code
