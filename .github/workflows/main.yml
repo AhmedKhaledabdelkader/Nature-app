@@ -6,7 +6,11 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Windows runner
+    runs-on: self-hosted  # Your Windows runner
+
+    defaults:
+      run:
+        shell: pwsh
 
     steps:
       - name: Checkout Code
@@ -15,29 +19,25 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: 8.2
           tools: composer
+          ini-file: production
 
-      
+      - name: Install Dependencies
+        run: composer install --no-dev --optimize-autoloader
 
-      - name: Copy Files to Deployment Folder
-        run: |
-          if exist C:\Naturebackend (
-            rmdir /s /q C:\Naturebackend
-          )
-          xcopy . C:\Naturebackend /E /H /C /I /Y
-        shell: cmd
-
-      - name: Set Permissions (Storage & Bootstrap Cache)
-        run: |
-          icacls "C:\Naturebackend\storage" /grant "Users:(OI)(CI)F"
-          icacls "C:\Naturebackend\bootstrap\cache" /grant "Users:(OI)(CI)F"
-        shell: cmd
+      - name: Copy Environment File
+        run: Copy-Item .env.production .env -Force
 
       - name: Run Laravel Optimizations
         run: |
-          cd C:\Naturebackend
-          php artisan config:cache
+          php artisan config:clear
+          php artisan cache:clear
           php artisan route:cache
+          php artisan config:cache
           php artisan view:cache
-        shell: cmd
+
+      - name: Deploy to IIS Folder
+        run: |
+          Remove-Item -Recurse -Force "C:\EVAWebsite\*" -ErrorAction SilentlyContinue
+          Copy-Item -Recurse -Force . "C:\EVAWebsite"
