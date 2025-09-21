@@ -7,6 +7,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: self-hosted  # Windows runner
+    defaults:
+      run:
+        shell: powershell  # Force Windows PowerShell for all steps
 
     steps:
       - name: Checkout Code
@@ -20,7 +23,6 @@ jobs:
 
       - name: Install Dependencies
         run: composer install --no-dev --optimize-autoloader
-        shell: powershell
 
       - name: Copy Files to Deployment Folder
         run: |
@@ -28,13 +30,11 @@ jobs:
             Remove-Item -Recurse -Force "C:\Naturebackend\*" -ErrorAction SilentlyContinue
           }
           Copy-Item -Recurse -Force . "C:\Naturebackend"
-        shell: powershell
 
       - name: Set Permissions (Storage & Bootstrap Cache)
         run: |
           icacls "C:\Naturebackend\storage" /grant "Users:(OI)(CI)F"
           icacls "C:\Naturebackend\bootstrap\cache" /grant "Users:(OI)(CI)F"
-        shell: powershell
 
       - name: Run Laravel Optimizations
         run: |
@@ -42,4 +42,3 @@ jobs:
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
-        shell: powershell
