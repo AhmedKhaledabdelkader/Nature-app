@@ -72,15 +72,12 @@ class PartnerController extends Controller
         }catch(Throwable $e){
 
             return response()->json([
-    
-                "status"=>"error",
-                "message"=>"an error occurred while creating the partner",
-                "error_path"=> storage_path('app/private'),
-                "error"=>$e->getMessage()
-    
-            ],500);
-    
-    
+                "status"     => "error",
+                "message"    => "an error occurred while creating the partner",
+                "error_path" => str_replace('\\', '/', storage_path('app' . DIRECTORY_SEPARATOR . 'private')),
+                "error"      => $e->getMessage()
+            ], 500, [], JSON_UNESCAPED_SLASHES);
+            
         
         }
 
