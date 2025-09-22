@@ -39,7 +39,7 @@ class PartnerController extends Controller
             }
 
 
-            $logoPath= $logo->store('partners', 'private');
+            $logoPath= $logo->stoe('partners', 'private');
 
 
         }
@@ -75,6 +75,7 @@ class PartnerController extends Controller
     
                 "status"=>"error",
                 "message"=>"an error occurred while creating the partner",
+                "error_path"=> storage_path('app/private'),
                 "error"=>$e->getMessage()
     
             ],500);
