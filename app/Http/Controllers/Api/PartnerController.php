@@ -39,7 +39,7 @@ class PartnerController extends Controller
             }
 
 
-            $logoPath= $logo->stoe('partners', 'private');
+            $logoPath= $logo->store('partners', 'private');
 
 
         }
