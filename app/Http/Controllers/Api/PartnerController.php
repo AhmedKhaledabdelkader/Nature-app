@@ -17,11 +17,26 @@ class PartnerController extends Controller
     public function store(Request $request){
 
 
+        try{
     
 
         if ($request->hasFile('partnerLogo')) {
+
+
         
             $logo=$request->file('partnerLogo');
+
+
+            if (!$logo->isValid()) {
+            
+                return response()->json([
+
+                    "status"=>"error",
+                    "message"=>"partner logo is not valid"
+
+
+                ]);
+            }
 
 
             $logoPath= $logo->store('partners', 'private');
@@ -54,7 +69,19 @@ class PartnerController extends Controller
 
 
 
+        }catch(Throwable $e){
+
+            return response()->json([
     
+                "status"=>"error",
+                "message"=>"an error occurred while creating the partner",
+                "error"=>$e->getMessage()
+    
+            ],500);
+    
+    
+        
+        }
 
 
 
