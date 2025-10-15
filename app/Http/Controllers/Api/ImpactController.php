@@ -18,8 +18,7 @@ class ImpactController extends Controller
     public function store(Request $request){
 
 
-   try{ 
-    
+  
     if ($request->hasFile("impactLogo")) {
             
             $logo = $request->file('impactLogo');
@@ -50,21 +49,7 @@ class ImpactController extends Controller
 
         ],201);
 
-    }catch(Throwable $e){
-
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while creating the impact",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-
-
-
-    }
+   
 
      
 
@@ -82,7 +67,7 @@ class ImpactController extends Controller
     {
 
 
-        try{
+     
 
         $impacts=Impact::all();
 
@@ -96,17 +81,7 @@ class ImpactController extends Controller
 
         ], 200);
 
-    }catch(Throwable $e){
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while retrieving the impacts",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-    }
+   
     
     }
 
@@ -121,7 +96,7 @@ class ImpactController extends Controller
     public function show($impactId)
     {
 
-        try{
+        
 
         $impact = Impact::find($impactId);
 
@@ -138,68 +113,46 @@ class ImpactController extends Controller
 
         ], 200);
 
-        }catch(Throwable $e){
-
-            return response()->json([
-    
-                "status"=>"error",
-                "message"=>"an error occurred while retrieving the impact",
-                "error"=>$e->getMessage()
-    
-            ],500);
-    
-        }
+        
     }
 
 
 
 
 
-    public function update(Request $request, $impactId)
-    {
-
-        try{
-
+   public function update(Request $request, $impactId)
+{
+    
         $impact = Impact::find($impactId);
 
         if (!$impact) {
             return response()->json(["message" => "Impact with id $impactId not found"], 404);
         }
 
-        if ($impact->impactLogo) {
-            Storage::disk('private')->delete($impact->impactLogo); 
-        }
-        
 
-        if ($request->hasFile("impactLogo")) {
+        $impact->impactName = $request->impactName;
+        $impact->impactNumber = $request->impactNumber;
 
+ 
+        if ($request->hasFile('impactLogo')) {
+
+           
+            if ($impact->impactLogo && Storage::disk('private')->exists($impact->impactLogo)) {
+                Storage::disk('private')->delete($impact->impactLogo);
+            }
 
             $logo = $request->file('impactLogo');
             $impact->impactLogo = $logo->store('impacts', 'private');
         }
 
-        $impact->impactName = $request->impactName;
-        $impact->impactNumber = $request->impactNumber;
+       
         $impact->save();
 
-        return response()->json([
-            "message" => "Impact updated successfully",
-            "impact" => $impact
-        ], 200);
+        return response()->json(["message" => "Impact updated successfully", "impact" => $impact], 200);
 
-    }catch(Throwable $e){
+   
+}
 
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while updating the impact",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-    }
-    
-    }
 
 
 
@@ -209,7 +162,7 @@ class ImpactController extends Controller
     public function destroy($impactId)
     {
 
-        try{
+        
 
         $impact = Impact::find($impactId);
 
@@ -224,18 +177,7 @@ class ImpactController extends Controller
 
         return response()->json(["message" => "Impact deleted successfully"], 200);
         
-    }catch(Throwable $e){
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while deleting the impact",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-
-    }
+    
 
     }
 

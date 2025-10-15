@@ -28,7 +28,7 @@ class ValidateTheme
             'themeDescription' => ['required', 'array'],
             'themeDescription.en' => ['required', 'string','max:5000'],
             'themeDescription.ar' => ["nullable",'sometimes', 'string','max:5000'],
-            'themeImage' => ['required', 'image', 'mimes:jpeg,png,webp,jpg,gif,svg', 'max:2048'],
+            'themeImage' => ["nullable","sometimes", 'image', 'mimes:jpeg,png,webp,jpg,gif,svg', 'max:2048'],
            
         ];
 

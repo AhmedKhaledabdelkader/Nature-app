@@ -17,7 +17,7 @@ class CompanyController extends Controller
     public function store(Request $request){
 
 
-try{
+
 
     $videoPath=null;
     $logoPath=null;
@@ -60,19 +60,7 @@ try{
 
         ],201);
 
-    }catch(Throwable $e){
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while creating the company",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-    }
-
-
+   
 
     }
     
@@ -87,7 +75,7 @@ try{
 public function index(Request $request){
 
 
-try{
+
 
     $companies = Company::all();
     return response()->json([
@@ -98,17 +86,7 @@ try{
 
     ],200);
 
-}catch(Throwable $e){
 
-    return response()->json([
-
-        "status"=>"error",
-        "message"=>"an error occurred while retrieving the companies",
-        "error"=>$e->getMessage()
-
-    ],500);
-
-}
 
 }
 
@@ -120,7 +98,7 @@ try{
 
 public function show(Request $request,$companyId){
 
-    try{
+   
 
     $company=Company::where("id",$companyId)->first();
 
@@ -147,102 +125,71 @@ public function show(Request $request,$companyId){
 
     ],200);
 
-}catch(Throwable $e){
-
-    return response()->json([
-
-        "status"=>"error",
-        "message"=>"an error occurred while retrieving the company",
-        "error"=>$e->getMessage()
-
-    ],500);
-
-}
 
 
 }
 
 
-public function update(Request $request,$companyId){
+public function update(Request $request, $companyId)
+{
+   
+        $company = Company::find($companyId);
 
-    try{
-
-    $company=Company::where("id",$companyId)->first();
-
-
-    if (!$company) {
-        
-        return response()->json([
-       
-            "message"=>"company with id $companyId not found"
-        
-
-
-        ],404);
-    }
-
-    $company->company_name=$request->company_name;
-    $company->company_description=$request->company_description;
-
-    
-
-        if ($company->company_image) {
-            Storage::disk('private')->delete($company->company_image); 
+        if (!$company) {
+            return response()->json([
+                "message" => "Company with id $companyId not found"
+            ], 404);
         }
 
+        // ✅ Update basic info
+        $company->company_name = $request->company_name;
+        $company->company_description = $request->company_description;
 
-        $video = $request->file('company_image');
-        $videoPath= $video->store('companies/videos', 'private'); 
-       
-        $company->company_image= $videoPath;
-    
-    
-    
+        // ✅ Update company_image ONLY if a new file is uploaded
+        if ($request->hasFile('company_image')) {
+            // delete old image if exists
+            if ($company->company_image && Storage::disk('private')->exists($company->company_image)) {
+                Storage::disk('private')->delete($company->company_image);
+            }
+
+            // store new file
+            $image = $request->file('company_image');
+            $imagePath = $image->store('companies/videos', 'private');
+            $company->company_image = $imagePath;
+        }
+
+        // ✅ Update company_logo ONLY if a new logo is uploaded
         if ($request->hasFile('company_logo')) {
+            // delete old logo if exists
+            if ($company->company_logo && Storage::disk('private')->exists($company->company_logo)) {
+                Storage::disk('private')->delete($company->company_logo);
+            }
 
-
-            
-        if ($company->company_logo) {
-            Storage::disk('private')->delete($company->company_logo); 
-        }
-
-
+            // store new logo
             $logo = $request->file('company_logo');
             $logoPath = $logo->store('companies/logos', 'private');
             $company->company_logo = $logoPath;
         }
 
-
+        // ✅ Save updates
         $company->save();
-
-    
-
 
         return response()->json([
             "message" => "Company updated successfully",
             "company" => $company
         ], 200);
 
-    }catch (Throwable $e) {
-        
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred updating the company",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-    }
-
-
-
+   
 }
+
+
+
+
 
 
 public function destroy(Request $request,$companyId){
 
-    try{
+   
 
     $company=Company::where("id",$companyId)->first();
 
@@ -283,17 +230,7 @@ public function destroy(Request $request,$companyId){
 
     ],200);
 
-    }catch(Throwable $e){
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while deleting the company",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-    }
+   
 
 
 

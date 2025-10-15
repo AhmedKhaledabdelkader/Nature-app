@@ -105,48 +105,57 @@ class ThemeController extends Controller
 
     }
 
-    public function update(Request $request, $themeId)
-    {
 
-    try{
 
+public function update(Request $request, $themeId)
+{
+    try {
         $theme = Theme::find($themeId);
 
         if (!$theme) {
-            return response()->json(["message" => "Theme with id $themeId not found"], 404);
+            return response()->json([
+                "message" => "Theme with id $themeId not found"
+            ], 404);
         }
 
-        if ($theme->themeImage) {
-            Storage::disk('private')->delete($theme->themeImage);
-        }
+        // ✅ Update basic fields
+        $theme->themeName = $request->themeName ?? $theme->themeName;
+        $theme->themeDescription = $request->themeDescription ?? $theme->themeDescription;
 
-        if ($request->hasFile("themeImage")) {
+        // ✅ Only update image if a new one is uploaded
+        if ($request->hasFile('themeImage')) {
+
+            // Delete old image if exists
+            if ($theme->themeImage && Storage::disk('private')->exists($theme->themeImage)) {
+                Storage::disk('private')->delete($theme->themeImage);
+            }
+
+            // Store new image
             $image = $request->file('themeImage');
-            $theme->themeImage = $image->store('themes', 'private');
+            $imagePath = $image->store('themes', 'private');
+            $theme->themeImage = $imagePath;
         }
 
-        $theme->themeName = $request->themeName;
-        $theme->themeDescription = $request->themeDescription;
+        // ✅ Save updates
         $theme->save();
 
         return response()->json([
             "message" => "Theme updated successfully",
             "theme" => $theme
         ], 200);
-    
-    }catch(Throwable $e){
 
+    } catch (\Throwable $e) {
         return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while updating theme",
-            "error"=>$e->getMessage()
-
-        ],500);
+            "status" => "error",
+            "message" => "An error occurred while updating the theme",
+            "error" => $e->getMessage()
+        ], 500);
     }
+}
 
 
-    }
+
+
 
     public function destroy($themeId)
     {

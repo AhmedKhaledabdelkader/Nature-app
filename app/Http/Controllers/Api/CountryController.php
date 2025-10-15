@@ -17,7 +17,7 @@ class CountryController extends Controller
     public function store(Request $request){
 
 
-try{
+
 
         $country=Country::create([
 
@@ -35,23 +35,7 @@ try{
 
 
         ],201);
-
-}catch(Throwable $e){
-
-
-    return response()->json([
-
-        "status"=>"error",
-        "message"=>"an error occurred while creating the country",
-        "error"=>$e->getMessage()
-
-    ],500);
     
-
-
-
-}
-        
 
 
     }
@@ -62,7 +46,7 @@ try{
    public function index()
     {
 
-    try{
+   
     
         $countries = Country::with("projects")->get();
 
@@ -75,20 +59,6 @@ try{
         ], 200);
 
 
-    }catch(Throwable $e){
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while retrieving the countries",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-    }
-
-
-
 
     }
 
@@ -98,7 +68,7 @@ try{
     public function show($countryId)
     {
 
-        try{
+       
 
         $country = Country::with("projects")->find($countryId);
     
@@ -113,17 +83,7 @@ try{
             "country" => new CountryResource($country)
         ], 200);
 
-        }catch(Throwable $e){
-
-            return response()->json([
-    
-                "status"=>"error",
-                "message"=>"an error occurred while retrieving  the country",
-                "error"=>$e->getMessage()
-    
-            ],500);
-    
-        }
+ 
     }
     
 
@@ -134,7 +94,7 @@ try{
 
     public function update(Request $request,$countryId){
 
-try{
+
         $country = Country::find($countryId);
 
         if (!$country) {
@@ -155,16 +115,7 @@ try{
 
 
         ],200);
-}catch(Throwable $e){
 
-
-    return response()->json([
-
-        "status"=>"error",
-        "message"=>"an error occurred while updating the country",
-        "error"=>$e->getMessage()
-
-    ],500);
 
 
 }
@@ -173,14 +124,14 @@ try{
 
 
 
-    }
+    
 
 
 
 public function destroy(Request $request,$countryId){
 
 
-    try{
+   
 
     $country = Country::find($countryId);
 
@@ -200,20 +151,8 @@ public function destroy(Request $request,$countryId){
 
     ],200);
 
-    }catch(Throwable $e){
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while deleting the country",
-            "error"=>$e->getMessage()
-
-        ],500);
-
     }
 
-
-
 }
 
 
@@ -224,4 +163,8 @@ public function destroy(Request $request,$countryId){
 
 
 
-}
+
+
+
+
+

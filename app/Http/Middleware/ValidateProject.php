@@ -25,7 +25,7 @@ class ValidateProject
             'projectDescription' => ['required', 'array'],
             'projectDescription.en' => ['required', 'string','max:5000'],
             'projectDescription.ar' => ["nullable",'sometimes', 'string','max:5000'],
-            'projectImage' => ['required', 'image', 'mimes:jpeg,png,webp,jpg,gif,svg', 'max:2048'],
+            'projectImage' => ["nullable","sometimes", 'image', 'mimes:jpeg,png,webp,jpg,gif,svg', 'max:2048'],
             'country_id' => ['required', 'exists:countries,id'],
         ];
 

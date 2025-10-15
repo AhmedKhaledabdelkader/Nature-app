@@ -17,7 +17,7 @@ class PartnerController extends Controller
     public function store(Request $request){
 
 
-        try{
+    
     
 
         if ($request->hasFile('partnerLogo')) {
@@ -68,31 +68,13 @@ class PartnerController extends Controller
 
 
 
-
-        }catch(Throwable $e){
-
-            return response()->json([
-                "status"     => "error",
-                "message"    => "an error occurred while creating the partner",
-                "error_path" => str_replace('\\', '/', storage_path('app' . DIRECTORY_SEPARATOR . 'private')),
-                "error"      => $e->getMessage()
-            ], 500, [], JSON_UNESCAPED_SLASHES);
-            
-        
-        }
-
-
-
-
-
     }
 
 
     public function index(Request $request){
 
 
-try
-{
+
 
         $partners=Partner::all();
 
@@ -106,26 +88,14 @@ try
 
         ],200);
     
-    }catch(Throwable $e){
 
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while retrieving the partners",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-
-
-    }
     }
 
 
     public function show($partnerId)
     {
 
-    try{
+   
         $partner = Partner::find($partnerId);
 
         if (!$partner) {
@@ -142,78 +112,56 @@ try
 
         ], 200);
 
-    }catch(Throwable $e){
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while retrieving the partner",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-
-    
-    }
-
+  
     }
 
 
 
-    public function update(Request $request, $partnerId)
-    {
-
-        try{
+   public function update(Request $request, $partnerId)
+{
 
         $partner = Partner::find($partnerId);
 
         if (!$partner) {
-            return response()->json(["message" => "partner with id $partnerId not found"], 404);
+            return response()->json([
+                "message" => "Partner with id $partnerId not found"
+            ], 404);
         }
 
-        if ($partner->partnerLogo) {
-            Storage::disk('private')->delete($partner->partnerLogo); 
-        }
-        
+        // ✅ Update basic fields
+        $partner->partnerName = $request->partnerName ?? $partner->partnerName;
 
-        if ($request->hasFile("partnerLogo")) {
+        // ✅ Only update the logo if a new file is uploaded
+        if ($request->hasFile('partnerLogo')) {
 
+            // Delete old logo if exists
+            if ($partner->partnerLogo && Storage::disk('private')->exists($partner->partnerLogo)) {
+                Storage::disk('private')->delete($partner->partnerLogo);
+            }
 
+            // Store the new logo
             $logo = $request->file('partnerLogo');
             $logoPath = $logo->store('partners', 'private');
+            $partner->partnerLogo = $logoPath;
         }
 
-        $partner->partnerLogo=$logoPath??null ;
-
-        $partner->partnerName = $request->partnerName??null;
+        // ✅ Save updates
         $partner->save();
 
         return response()->json([
-            "message" => "partner updated successfully",
+            "message" => "Partner updated successfully",
             "partner" => $partner
-        ], 200);}catch(\Throwable  $e){
+        ], 200);
 
-
-            return response()->json([
-    
-                "status"=>"error",
-                "message"=>"an error occurred while updating the partner",
-                "error"=>$e->getMessage()
-    
-            ],500);
-    
-    
-    
-    
-        }
-    }
+   
+}
 
 
 
 
     public function destroy($partnerId)
     {
-try{
+
 
         $partner = Partner::find($partnerId);
 
@@ -230,18 +178,7 @@ try{
 
         return response()->json(["message" => "partner deleted successfully"], 200);
 
-    }catch(Throwable $e){
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while deleting the partner",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-
-    }
+   
 
 
 
