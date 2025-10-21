@@ -21,12 +21,9 @@ class ValidateCompany
         $rules=[
 
 
-            'company_name'=>['required','array'],
-            'company_name.en'=>["required","string","max:255"],
-            'company_name.ar'=>["nullable","sometimes","string","max:255"],
-            'company_description'=>['required','array'],
-            'company_description.en'=>['required','string','max:5000'],
-            'company_description.ar'=>["nullable","sometimes","string","max:5000"],
+            'locale'=> ['required', 'in:ar,en'],
+            'company_name'=>["required","string","max:255"],
+            'company_description'=>['required','string','max:5000'],
             'company_image' => [
                 "nullable","sometimes",
                 'mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,image/svg+xml',

@@ -25,6 +25,12 @@ class Theme extends Model
 
     public $translatable=["themeName","themeDescription"];
 
+    
+    public function setLocalizedValue(string $field, string $locale, $value): void
+    {
+        $this->setTranslation($field, $locale, $value);
+    }
+
     protected static function boot()
     {
         parent::boot();

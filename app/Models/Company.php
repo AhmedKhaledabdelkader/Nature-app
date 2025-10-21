@@ -25,6 +25,14 @@ class Company extends Model
 
 public $translatable=["company_name","company_description"];
 
+
+
+ public function setLocalizedValue(string $field, string $locale, $value): void
+    {
+        $this->setTranslation($field, $locale, $value);
+    }
+
+
     
 protected static function boot()
     {

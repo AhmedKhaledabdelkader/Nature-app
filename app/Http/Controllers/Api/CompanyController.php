@@ -8,6 +8,7 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Exception;
+use Illuminate\Support\Facades\App;
 use Throwable;
 
 class CompanyController extends Controller
@@ -21,6 +22,10 @@ class CompanyController extends Controller
 
     $videoPath=null;
     $logoPath=null;
+
+
+    App::setLocale($request->locale ?? 'en');
+
 
         if ($request->hasFile('company_image')) {
           
@@ -39,14 +44,10 @@ class CompanyController extends Controller
         $company=Company::create([
 
 
-            "company_name"=>$request->company_name,
-            "company_description"=>$request->company_description,
+            "company_name"=>[ $request->locale => $request->company_name ?? null,],
+            "company_description"=>[ $request->locale => $request->company_description?? null,],
             "company_image"=>$videoPath,
             "company_logo"=>$logoPath??null
-
-
-
-
 
         ]);
 
@@ -54,7 +55,7 @@ class CompanyController extends Controller
         return response()->json([
 
             "message"=>"company created successfully",
-             "company"=>$company
+             "company"=>new CompanyResource($company)
             
 
 
@@ -141,18 +142,20 @@ public function update(Request $request, $companyId)
             ], 404);
         }
 
-        // ✅ Update basic info
-        $company->company_name = $request->company_name;
-        $company->company_description = $request->company_description;
+         App::setLocale($request->locale ?? 'en');
 
-        // ✅ Update company_image ONLY if a new file is uploaded
+     
+        $company->setLocalizedValue('company_name', $request->locale, $request->company_name);
+        $company->setLocalizedValue('company_description', $request->locale, $request->company_description);
+
+    
         if ($request->hasFile('company_image')) {
             // delete old image if exists
             if ($company->company_image && Storage::disk('private')->exists($company->company_image)) {
                 Storage::disk('private')->delete($company->company_image);
             }
 
-            // store new file
+         
             $image = $request->file('company_image');
             $imagePath = $image->store('companies/videos', 'private');
             $company->company_image = $imagePath;
@@ -176,7 +179,7 @@ public function update(Request $request, $companyId)
 
         return response()->json([
             "message" => "Company updated successfully",
-            "company" => $company
+            "company" => new CompanyResource($company)
         ], 200);
 
    

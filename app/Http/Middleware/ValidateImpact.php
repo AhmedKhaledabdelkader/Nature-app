@@ -21,9 +21,8 @@ class ValidateImpact
         $rules=[
 
 
-            'impactName'=>['required','array'],
-            'impactName.en'=>["required","string","max:255"],
-            'impactName.ar'=>["nullable","sometimes","string","max:255"],
+            'locale'=> ['required', 'in:ar,en'],
+            'impactName'=>["required","string","max:255"],
             'impactNumber'=>['required','Integer'],
             'impactLogo'=>['nullable',"sometimes",'image','mimes:jpeg,png,webp,jpg,gif,svg','max:2048']
 

@@ -7,6 +7,7 @@ use App\Http\Resources\CountryResource;
 use App\Models\Country;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
@@ -16,12 +17,12 @@ class CountryController extends Controller
 
     public function store(Request $request){
 
-
+    App::setLocale($request->locale ?? 'en');
 
 
         $country=Country::create([
 
-            "countryName"=>$request->countryName
+            "countryName"=>[ $request->locale => $request->countryName ?? null,],
 
         ]);
 
@@ -30,7 +31,7 @@ class CountryController extends Controller
 
 
             "message"=>"country created successfully",
-            "country"=>$country
+            "country"=>new CountryResource($country)
 
 
 
@@ -101,8 +102,9 @@ class CountryController extends Controller
             return response()->json(["message" => "country with id $countryId not found"], 404);
         }
 
+        App::setLocale($request->locale ?? 'en');
     
-        $country->countryName=$request->countryName ;
+        $country->setLocalizedValue('countryName', $request->locale, $request->countryName);
 
         $country->save();
 
@@ -110,7 +112,7 @@ class CountryController extends Controller
         return response()->json([
 
              "message"=>"country with id $countryId updated successfully",
-             "country"=>$country
+             "country"=>new CountryResource($country)
 
 
 

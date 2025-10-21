@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PartnerResource;
 use App\Models\Partner;
 use Illuminate\Http\Request;
-use Exception;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
+use Illuminate\Support\Facades\App;
+
+
+
+
 
 class PartnerController extends Controller
 {
@@ -17,8 +20,8 @@ class PartnerController extends Controller
     public function store(Request $request){
 
 
-    
-    
+
+         App::setLocale($request->locale ?? 'en');
 
         if ($request->hasFile('partnerLogo')) {
 
@@ -44,22 +47,19 @@ class PartnerController extends Controller
 
         }
 
-      $partner=Partner::create([
-
-
-        "partnerName"=>$request->partnerName??null,
-        "partnerLogo"=>$logoPath??null
-
-
-
-
-      ]);
+    
+        $partner = Partner::create([
+    'partnerName' => [
+        $request->locale => $request->partnerName ?? null, 
+    ],
+    'partnerLogo' => $logoPath ?? null,
+]);
 
 
       return response()->json([
 
         "message"=>"partner created successfully",
-        "partner"=>$partner
+        "partner" => new PartnerResource($partner)
 
 
 
@@ -116,45 +116,39 @@ class PartnerController extends Controller
     }
 
 
-
-   public function update(Request $request, $partnerId)
+public function update(Request $request, $partnerId)
 {
+    $partner = Partner::find($partnerId);
 
-        $partner = Partner::find($partnerId);
-
-        if (!$partner) {
-            return response()->json([
-                "message" => "Partner with id $partnerId not found"
-            ], 404);
-        }
-
-        // ✅ Update basic fields
-        $partner->partnerName = $request->partnerName ?? $partner->partnerName;
-
-        // ✅ Only update the logo if a new file is uploaded
-        if ($request->hasFile('partnerLogo')) {
-
-            // Delete old logo if exists
-            if ($partner->partnerLogo && Storage::disk('private')->exists($partner->partnerLogo)) {
-                Storage::disk('private')->delete($partner->partnerLogo);
-            }
-
-            // Store the new logo
-            $logo = $request->file('partnerLogo');
-            $logoPath = $logo->store('partners', 'private');
-            $partner->partnerLogo = $logoPath;
-        }
-
-        // ✅ Save updates
-        $partner->save();
-
+    if (!$partner) {
         return response()->json([
-            "message" => "Partner updated successfully",
-            "partner" => $partner
-        ], 200);
+            "message" => "Partner with id $partnerId not found"
+        ], 404);
+    }
 
-   
+     App::setLocale($request->locale ?? 'en');
+
+    
+   $partner->setLocalizedValue('partnerName', $request->locale, $request->partnerName);
+
+    if ($request->hasFile('partnerLogo')) {
+        if ($partner->partnerLogo && Storage::disk('private')->exists($partner->partnerLogo)) {
+            Storage::disk('private')->delete($partner->partnerLogo);
+        }
+
+        $logo = $request->file('partnerLogo');
+        $logoPath = $logo->store('partners', 'private');
+        $partner->partnerLogo = $logoPath;
+    }
+
+    $partner->save();
+
+    return response()->json([
+        "message" => "Partner updated successfully", 
+        "partner" => new PartnerResource($partner)
+    ], 200);
 }
+
 
 
 

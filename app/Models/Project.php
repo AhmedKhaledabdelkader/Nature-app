@@ -18,6 +18,13 @@ class Project extends Model
 
     public $translatable=['projectName', 'projectDescription'];
 
+
+     public function setLocalizedValue(string $field, string $locale, $value): void
+    {
+        $this->setTranslation($field, $locale, $value);
+    }
+
+
     protected static function boot()
     {
         parent::boot();

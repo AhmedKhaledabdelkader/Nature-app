@@ -20,9 +20,9 @@ class ValidateCountry
 
         $validator=Validator::make($request->all(),[
 
-            "countryName"=>["required","array"],
-            "countryName.en"=>["required","string","min:2","max:50"],
-            "countryName.ar"=>["nullable","sometimes","string","min:2","max:50"],
+            'locale'=> ['required', 'in:ar,en'],          
+            "countryName"=>["required","string","min:2","max:50"],
+           
         ]);
 
         if($validator->fails()){

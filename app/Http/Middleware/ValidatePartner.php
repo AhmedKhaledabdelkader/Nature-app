@@ -20,11 +20,12 @@ class ValidatePartner
 
         $rules=[
 
+         
 
-            'partnerName'=>['required','array'],
-            'partnerName.en'=>["sometimes","string","max:255"],
-            'partnerName.ar'=>["nullable","sometimes","string","max:255"],
+            'locale'=> ['required', 'in:ar,en'],
+            'partnerName'=>["sometimes","string","max:255"],
             'partnerLogo'=>["nullable","sometimes",'image','mimes:jpeg,png,webp,jpg,gif,svg','max:2048']
+
 
 
         ];

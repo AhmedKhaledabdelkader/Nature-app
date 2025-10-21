@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 
 use Exception ;
+use Illuminate\Support\Facades\App;
 use Throwable;
 
 class ThemeController extends Controller
@@ -21,8 +22,11 @@ class ThemeController extends Controller
 
     public function store(Request $request)
     {
-        try {
+       
             $imagePath = null;
+
+        App::setLocale($request->locale ?? 'en');
+
             
             if ($request->hasFile("themeImage")) {
                 $image = $request->file('themeImage');
@@ -30,28 +34,20 @@ class ThemeController extends Controller
             }
 
             $theme = Theme::create([
-                "themeName" => $request->themeName,
-                "themeDescription" => $request->themeDescription,
-                "themeImage" => $imagePath
+                "themeName" => [ $request->locale => $request->themeName ?? null,],
+                "themeDescription" =>[ $request->locale => $request->themeDescription ?? null,],
+                "themeImage" => $imagePath??null
             ]);
 
             return response()->json([
                 "message" => "theme created successfully",
-                "theme" => $theme
+                "theme" => new ThemeResource($theme)
             ], 201);
-        } catch (Throwable $e) {
-            return response()->json([
-                "status" => "error",
-                "message" => "an error occurred while creating the theme",
-                "error" => $e->getMessage()
-            ], 500);
-        }
-    }
+        } 
 
     public function index()
     {
 
-    try{
 
         $themes = Theme::all();
 
@@ -61,24 +57,10 @@ class ThemeController extends Controller
     
         ], 200);
 
-    }catch(Throwable $e){
+    }
 
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while retrieving themes",
-            "error"=>$e->getMessage()
-
-        ],500);
+    public function show($themeId){
     
-    }
-
-    }
-
-    public function show($themeId)
-    {
-
-        try{
 
         $theme = Theme::find($themeId);
 
@@ -91,25 +73,14 @@ class ThemeController extends Controller
             "message" => "retreiving theme successfully",
             "theme" => new ThemeResource($theme),
         ], 200);
-    }catch(Throwable $e){
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while retrieving theme",
-            "error"=>$e->getMessage()
-
-        ],500);
-    }
-
+    
 
     }
 
 
 
-public function update(Request $request, $themeId)
-{
-    try {
+public function update(Request $request, $themeId){
+
         $theme = Theme::find($themeId);
 
         if (!$theme) {
@@ -118,49 +89,41 @@ public function update(Request $request, $themeId)
             ], 404);
         }
 
-        // ✅ Update basic fields
-        $theme->themeName = $request->themeName ?? $theme->themeName;
-        $theme->themeDescription = $request->themeDescription ?? $theme->themeDescription;
+         App::setLocale($request->locale ?? 'en');
+        
+         $theme->setLocalizedValue('themeName', $request->locale, $request->themeName);
+         $theme->setLocalizedValue('themeDescription', $request->locale, $request->themeDescription);
 
-        // ✅ Only update image if a new one is uploaded
+      
         if ($request->hasFile('themeImage')) {
 
-            // Delete old image if exists
+       
             if ($theme->themeImage && Storage::disk('private')->exists($theme->themeImage)) {
                 Storage::disk('private')->delete($theme->themeImage);
             }
 
-            // Store new image
+            
             $image = $request->file('themeImage');
             $imagePath = $image->store('themes', 'private');
             $theme->themeImage = $imagePath;
         }
 
-        // ✅ Save updates
         $theme->save();
 
         return response()->json([
             "message" => "Theme updated successfully",
-            "theme" => $theme
+            "theme" => new ThemeResource($theme)
         ], 200);
 
-    } catch (\Throwable $e) {
-        return response()->json([
-            "status" => "error",
-            "message" => "An error occurred while updating the theme",
-            "error" => $e->getMessage()
-        ], 500);
-    }
+   
 }
 
 
 
 
 
-    public function destroy($themeId)
-    {
-
-        try{
+    public function destroy($themeId){
+    
 
         $theme = Theme::find($themeId);
 
@@ -175,23 +138,13 @@ public function update(Request $request, $themeId)
         $theme->delete();
 
         return response()->json(["message" => "Theme deleted successfully"], 200);
-    }catch(Throwable $e){
-
-        return response()->json([
-
-            "status"=>"error",
-            "message"=>"an error occurred while deleting theme",
-            "error"=>$e->getMessage()
-
-        ],500);
-
-    }
+  
 }
-}
+
     
 
 
-
+}
 
 
 

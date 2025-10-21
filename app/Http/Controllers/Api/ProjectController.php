@@ -7,6 +7,7 @@ use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Exception ;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
@@ -20,6 +21,8 @@ class ProjectController extends Controller
 
         $imagePath=null;
 
+         App::setLocale($request->locale ?? 'en');
+
         if ($request->hasFile("projectImage")) {
         
             $image= $request->file('projectImage');
@@ -31,8 +34,8 @@ class ProjectController extends Controller
         $project=Project::create([
 
 
-            "projectName"=>$request->projectName,
-            "projectDescription"=>$request->projectDescription,
+            "projectName"=> [$request->locale => $request->projectName ?? null, ],
+            "projectDescription"=>[$request->locale => $request->projectDescription ?? null, ],
             "projectImage"=>$imagePath,
             "country_id"=>$request->country_id
 
@@ -43,7 +46,7 @@ class ProjectController extends Controller
 
 
             "message"=>"project created successfully",
-            "project"=>$project
+            "project"=>new ProjectResource($project)
 
 
 
@@ -113,31 +116,32 @@ public function update(Request $request, $projectId)
             ], 404);
         }
 
-        // ✅ Update basic fields
-        $project->projectName = $request->projectName ?? $project->projectName;
-        $project->projectDescription = $request->projectDescription ?? $project->projectDescription;
-        $project->country_id = $request->country_id ?? $project->country_id;
+         App::setLocale($request->locale ?? 'en');
 
-        // ✅ Only update the image if a new file is uploaded
+
+       $project->setLocalizedValue('projectName', $request->locale, $request->projectName);
+       $project->setLocalizedValue('projectDescription', $request->locale, $request->projectDescription);
+       $project->country_id = $request->country_id ?? $project->country_id;
+
+      
         if ($request->hasFile('projectImage')) {
 
-            // Delete old image if exists
+       
             if ($project->projectImage && Storage::disk('private')->exists($project->projectImage)) {
                 Storage::disk('private')->delete($project->projectImage);
             }
 
-            // Store new image
             $image = $request->file('projectImage');
             $imagePath = $image->store('projects', 'private');
             $project->projectImage = $imagePath;
         }
 
-        // ✅ Save updates
+      
         $project->save();
 
         return response()->json([
             "message" => "Project updated successfully",
-            "project" => $project
+            "project" => new ProjectResource($project)
         ], 200);
 
 

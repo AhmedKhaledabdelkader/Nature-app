@@ -8,8 +8,7 @@ use Spatie\Translatable\HasTranslations;
 
 class Impact extends Model
 {
-    
-    use HasTranslations ;
+    use HasTranslations;
 
     public $incrementing = false;   
     protected $keyType = 'string';  
@@ -20,8 +19,12 @@ class Impact extends Model
         'impactLogo',
     ];
 
+    public $translatable = ['impactName'];
 
-    public $translatable=["impactName"];
+    public function setLocalizedValue(string $field, string $locale, $value): void
+    {
+        $this->setTranslation($field, $locale, $value);
+    }
 
     protected static function boot()
     {

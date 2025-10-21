@@ -19,6 +19,12 @@ class Country extends Model
 
     public $translatable=['countryName'];
 
+    
+    public function setLocalizedValue(string $field, string $locale, $value): void
+    {
+        $this->setTranslation($field, $locale, $value);
+    }
+
     protected static function boot()
     {
         parent::boot();

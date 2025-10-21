@@ -20,8 +20,15 @@ class Partner extends Model
         'partnerLogo'
     ];
 
+  
 
     public $translatable=["partnerName"];
+
+    
+    public function setLocalizedValue(string $field, string $locale, $value): void
+    {
+        $this->setTranslation($field, $locale, $value);
+    }
 
     protected static function boot()
     {

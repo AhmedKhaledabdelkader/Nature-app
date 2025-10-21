@@ -19,12 +19,10 @@ class ValidateProject
 
 
         $rules = [
-            'projectName' => ['required','array'],
-            'projectName.en'=>['required','string', 'max:255'],
-            "projectName.ar"=>["nullable",'sometimes','string', 'max:255'],
-            'projectDescription' => ['required', 'array'],
-            'projectDescription.en' => ['required', 'string','max:5000'],
-            'projectDescription.ar' => ["nullable",'sometimes', 'string','max:5000'],
+    
+            'locale'=> ['required', 'in:ar,en'],
+            'projectName'=>['required','string', 'max:255'],
+            'projectDescription' => ['required', 'string','max:5000'],
             'projectImage' => ["nullable","sometimes", 'image', 'mimes:jpeg,png,webp,jpg,gif,svg', 'max:2048'],
             'country_id' => ['required', 'exists:countries,id'],
         ];

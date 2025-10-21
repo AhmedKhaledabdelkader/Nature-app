@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Impact;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Throwable;
 use Illuminate\Support\Facades\Log; 
 
@@ -17,6 +18,8 @@ class ImpactController extends Controller
 
     public function store(Request $request){
 
+
+    App::setLocale($request->locale ?? 'en');
 
   
     if ($request->hasFile("impactLogo")) {
@@ -29,7 +32,7 @@ class ImpactController extends Controller
         $impact=Impact::create([
 
 
-            "impactName"=>$request->impactName,
+            "impactName"=>[ $request->locale => $request->impactName ?? null,],
             "impactNumber"=>$request->impactNumber,
             "impactLogo"=>$logoPath
 
@@ -43,7 +46,7 @@ class ImpactController extends Controller
 
 
             "message"=>"impact created successfully",
-            "impact"=>$impact
+            "impact"=>new ImpactResource($impact)
 
 
 
@@ -129,9 +132,11 @@ class ImpactController extends Controller
             return response()->json(["message" => "Impact with id $impactId not found"], 404);
         }
 
+        App::setLocale($request->locale ?? 'en');
 
-        $impact->impactName = $request->impactName;
-        $impact->impactNumber = $request->impactNumber;
+     $impact->setLocalizedValue('impactName', $request->locale, $request->impactName);
+
+     $impact->impactNumber = $request->impactNumber;
 
  
         if ($request->hasFile('impactLogo')) {
@@ -148,7 +153,7 @@ class ImpactController extends Controller
        
         $impact->save();
 
-        return response()->json(["message" => "Impact updated successfully", "impact" => $impact], 200);
+        return response()->json(["message" => "Impact updated successfully", "impact" =>new ImpactResource($impact) ], 200);
 
    
 }
